@@ -12,7 +12,6 @@ class UserModelTest(TestCase):
         del self.user
 
     def test_default_values(self):
-        # pass
         mock_date = timezone.now()
         with mock.patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = mock_date
