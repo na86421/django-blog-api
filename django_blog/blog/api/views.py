@@ -55,9 +55,7 @@ class LoginView(APIView):
         data = request.data
 
         try:
-            # print(data['username'], data['password'])
             user = authenticate(username=data['username'], password=data['password'])
-            print(user)
             if user is None:
                 return Response({'msg': '로그인에 실패하였습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
 
