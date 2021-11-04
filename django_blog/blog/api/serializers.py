@@ -8,8 +8,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         User = get_user_model()
         model = User
-        fields = '__all__'
-
+        exclude = ['password']
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:

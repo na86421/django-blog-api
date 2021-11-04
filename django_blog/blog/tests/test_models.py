@@ -6,20 +6,20 @@ from django.test import TestCase
 
 from blog.models import Category, Post
 
+
+User = get_user_model()
+
+
 class UserModelTest(TestCase):
     def setUp(self):
         print(f'-------{self._testMethodName}-------')
-        self.user = get_user_model()
-        
-    def tearDown(self):
-        del self.user
 
     def test_create_user(self):
         mock_date = timezone.now()
         with mock.patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = mock_date
-            user = self.user.objects.create(email='na66421@gmail.com', username='na66421',
-                                            name='윤준기', password='qwer1234')
+            user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                       name='윤준기', password='qwer1234')
 
         self.assertEqual(user.email, 'na66421@gmail.com', 'email 불일치')
         self.assertEqual(user.username, 'na66421', 'username 불일치')
@@ -33,8 +33,8 @@ class UserModelTest(TestCase):
         mock_date = timezone.now()
         with mock.patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = mock_date
-            user = self.user.objects.create(email='na66421@gmail.com', username='na66421',
-                                            name='윤준기', password='qwer1234')
+            user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                       name='윤준기', password='qwer1234')
             category = Category.objects.create(name='프로그래밍', user=user)
 
         self.assertEqual(category.name, '프로그래밍', '카테고리 이름 불일치')
@@ -47,8 +47,8 @@ class UserModelTest(TestCase):
         mock_date = timezone.now()
         with mock.patch('django.utils.timezone.now') as mock_now:
             mock_now.return_value = mock_date
-            user = self.user.objects.create(email='na66421@gmail.com', username='na66421',
-                                            name='윤준기', password='qwer1234')
+            user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                       name='윤준기', password='qwer1234')
             category = Category.objects.create(name='프로그래밍', user=user)
             post = Post.objects.create(title='프로그래밍', content='프로그래밍', category=category,
                                        user=user)

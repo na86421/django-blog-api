@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path
 from django.conf.urls import include
 
+from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
 from blog.api import views
@@ -29,5 +30,8 @@ router.register('posts', views.PostViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include(router.urls), name='api')
+    path('api-token-auth/', obtain_auth_token),
+    path('api/', include(router.urls), name='api'),
+    path('signup/', views.SignUpView.as_view()),
+    path('login/', views.LoginView.as_view()),
 ]
