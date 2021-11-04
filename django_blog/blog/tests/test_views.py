@@ -9,8 +9,6 @@ from rest_framework.test import APIClient
 from blog.models import Category, Post
 from blog.api.serializers import UserSerializer, CategorySerializer, PostSerializer
 
-# from model_mommy import mommy
-
 
 User = get_user_model()
 
