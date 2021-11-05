@@ -94,3 +94,68 @@ class LoginViewTest(connectAPITest):
         res = self.client.post('/login/', json.dumps(data), content_type="application/json")
         self.assertEqual(res.status_code, 200)
         self.assertEqual(res.json()['msg'], '로그인 되었습니다.')
+
+
+class CategoryViewSetTest(connectAPITest):
+    def test_create(self):
+        # json KeyError 발생 경우
+        data = {}
+
+        res = self.client.post('/api/categorys/', json.dumps(data), content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '필수 입력항목을 입력해주세요.', 'KeyError 예외처리 실패')
+
+        # 올바른 경우
+        data['name'] = 'python'
+        res = self.client.post('/api/categorys/', json.dumps(data), content_type="application/json")
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.json()['msg'], '카테고리가 생성되었습니다.', '카테고리 생성 실패')
+        self.assertEqual(res.json()['category']['user'], self.user.id, '카테고리 생성 유저 불일치')
+
+        # 동일한 카테고리명일 경우
+        res = self.client.post('/api/categorys/', json.dumps(data), content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '이미 존재하는 카테고리명 입니다.',
+                         '동일한 이름을 가진 카테고리 생성 금지 실패')
+
+    def test_destroy(self):
+        user2 = User.objects.create_user(username='na664212', name='윤준기2', password='qwer!@#$')
+        category = Category.objects.create(name='python', user=self.user)
+        category2 = Category.objects.create(name='python', user=user2)
+
+        # 올바른 경우
+        res = self.client.delete(f'/api/categorys/{category.id}/')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['msg'], '카테고리가 삭제되었습니다.', '카테고리 삭제 실패')
+
+        # 카테고리를 생성한 유저가 아닐 경우
+        res = self.client.delete(f'/api/categorys/{category2.id}/')
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '카테고리를 생성한 유저가 아닙니다.')
+
+    def test_update(self):
+        user2 = User.objects.create_user(username='na664212', name='윤준기2', password='qwer!@#$')
+        category = Category.objects.create(name='python', user=self.user)
+        category2 = Category.objects.create(name='python', user=user2)
+
+        # json KeyError 발생 경우
+        data = {}
+        res = self.client.patch(f'/api/categorys/{category.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '필수 입력항목을 입력해주세요.', 'KeyError 예외처리 실패')
+
+        # 올바른 경우
+        data['name'] = 'django'
+        res = self.client.patch(f'/api/categorys/{category.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['msg'], '카테고리 이름이 변경되었습니다.', '카테고리 수정 실패')
+        self.assertEqual(res.json()['category']['name'], data['name'], '카테고리 수정 실패')
+
+        # 카테고리를 생성한 유저가 아닐 경우
+        res = self.client.patch(f'/api/categorys/{category2.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '카테고리를 생성한 유저가 아닙니다.')
+        

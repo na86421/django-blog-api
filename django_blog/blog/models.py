@@ -23,6 +23,9 @@ class Category(Timestampable):
     def __str__(self):
         return f'{self.user.name}:{self.name}'
 
+    def has_permission(self, user):
+        return True if self.user == user else False
+
 class Post(Timestampable):
     title = models.CharField(max_length=50, help_text='포스트 제목')
     content = models.CharField(max_length=100, help_text='포스트 내용')
