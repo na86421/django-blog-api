@@ -136,7 +136,7 @@ class CategoryViewSetTest(connectAPITest):
     def test_update(self):
         user2 = User.objects.create_user(username='na664212', name='윤준기2', password='qwer!@#$')
         category = Category.objects.create(name='python', user=self.user)
-        category2 = Category.objects.create(name='python', user=user2)
+        category2 = Category.objects.create(name='python2', user=user2)
 
         # json KeyError 발생 경우
         data = {}
@@ -153,9 +153,115 @@ class CategoryViewSetTest(connectAPITest):
         self.assertEqual(res.json()['msg'], '카테고리 이름이 변경되었습니다.', '카테고리 수정 실패')
         self.assertEqual(res.json()['category']['name'], data['name'], '카테고리 수정 실패')
 
+        # 이미 존재하는 카테고리명인 경우
+        data['name'] = 'python2'
+        res = self.client.patch(f'/api/categorys/{category.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '이미 존재하는 카테고리명 입니다.')
+
         # 카테고리를 생성한 유저가 아닐 경우
         res = self.client.patch(f'/api/categorys/{category2.id}/', json.dumps(data),
                                 content_type="application/json")
         self.assertEqual(res.status_code, 400)
         self.assertEqual(res.json()['msg'], '카테고리를 생성한 유저가 아닙니다.')
         
+
+class PostViewSetTest(connectAPITest):
+    def setUp(self):
+        super().setUp()
+        self.user2 = User.objects.create_user(username='na664212', name='윤준기2', password='qwer!@#$')
+        self.category = Category.objects.create(name='python', user=self.user)
+        self.category2 = Category.objects.create(name='python2', user=self.user2)
+        self.post = Post.objects.create(title='title', content='content', category=self.category,
+                                        user=self.user)
+        self.post2 = Post.objects.create(title='title', content='content', category=self.category,
+                                        user=self.user2)
+
+
+    def test_create(self):
+        # json KeyError 발생 경우
+        data = {}
+
+        res = self.client.post('/api/posts/', json.dumps(data), content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '필수 입력항목을 입력해주세요.', 'KeyError 예외처리 실패')
+
+        # 올바른 경우
+        category = Category.objects.create(name='python', user=self.user)
+        data = {
+            'title': 'title',
+            'content': 'content',
+            'category_id': category.id,
+        }
+
+        res = self.client.post('/api/posts/', json.dumps(data), content_type="application/json")
+        self.assertEqual(res.status_code, 201)
+        self.assertEqual(res.json()['msg'], '포스트가 생성되었습니다.', '포스트 생성 실패')
+        self.assertEqual(res.json()['post']['user'], self.user.id, '포스트 생성 유저 불일치')
+
+    def test_destroy(self):
+        # 올바른 경우
+        res = self.client.delete(f'/api/posts/{self.post.id}/', content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['msg'], '포스트가 삭제되었습니다.', '포스트 삭제 실패')
+        
+        # 포스트를 생성한 유저가 아닌 경우
+        res = self.client.delete(f'/api/posts/{self.post2.id}/', content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '포스트를 생성한 유저가 아닙니다.')
+
+
+    def test_update(self):
+        # json KeyError 발생 경우
+        data = {}
+        res = self.client.patch(f'/api/posts/{self.post.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '필수 입력항목을 입력해주세요.', 'KeyError 예외처리 실패')
+
+        # 올바른 경우
+        data = {
+            'title': 'title_change',
+            'content': 'content_change',
+        }
+        res = self.client.patch(f'/api/posts/{self.post.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['msg'], '포스트가 변경되었습니다.', '포스트 수정 실패')
+        self.assertEqual(res.json()['post']['title'], data['title'], '포스트 수정 실패')
+        self.assertEqual(res.json()['post']['content'], data['content'], '포스트 수정 실패')
+
+        # 포스트를 생성한 유저가 아닐 경우
+        res = self.client.patch(f'/api/posts/{self.post2.id}/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '포스트를 생성한 유저가 아닙니다.')
+
+    def test_change_category(self):
+        # json KeyError 발생 경우
+        data = {}
+        res = self.client.patch(f'/api/posts/{self.post.id}/change_category/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '필수 입력항목을 입력해주세요.', 'KeyError 예외처리 실패')
+
+        # 포스트를 생성한 유저가 아닐 경우
+        res = self.client.patch(f'/api/posts/{self.post2.id}/change_category/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '포스트를 생성한 유저가 아닙니다.')
+
+        # 유효하지 않은 카테고리인 경우
+        data['category_id'] = '9999'
+        res = self.client.patch(f'/api/posts/{self.post.id}/change_category/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.json()['msg'], '유효한 카테고리가 아닙니다.')
+
+        # 올바른 경우
+        data['category_id'] = self.category2.id
+        res = self.client.patch(f'/api/posts/{self.post.id}/change_category/', json.dumps(data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['msg'], '포스트의 카테고리가 변경되었습니다.')

@@ -29,17 +29,6 @@ class UserModelTest(TestCase):
         self.assertEqual(user.modified_at, mock_date, '수정시간 불일치')
         self.assertEqual(str(user), user.name, '__str__ 불일치')
 
-    def test_has_permission(self):
-        user = User.objects.create(email='na66421@gmail.com', username='na66421',
-                                   name='윤준기', password='qwer1234')
-        user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
-                                   name='윤준기2', password='qwer1234')
-
-        category = Category.objects.create(name='프로그래밍', user=user)
-
-        self.assertTrue(category.has_permission(user))
-        self.assertFalse(category.has_permission(user2))
-
 
 class CategoryTest(TestCase):
     def setUp(self):
@@ -58,6 +47,17 @@ class CategoryTest(TestCase):
         self.assertEqual(category.created_at, mock_date, '생성시간 불일치')
         self.assertEqual(category.modified_at, mock_date, '수정시간 불일치')
         self.assertEqual(str(category), f'{user.name}:{category.name}', '__str__ 불일치')
+
+    def test_has_permission(self):
+        user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                   name='윤준기', password='qwer1234')
+        user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
+                                   name='윤준기2', password='qwer1234')
+
+        category = Category.objects.create(name='프로그래밍', user=user)
+
+        self.assertTrue(category.has_permission(user))
+        self.assertFalse(category.has_permission(user2))
 
 
 class PostTest(TestCase):
@@ -80,3 +80,15 @@ class PostTest(TestCase):
         self.assertEqual(post.created_at, mock_date, '생성시간 불일치')
         self.assertEqual(post.modified_at, mock_date, '수정시간 불일치')
         self.assertEqual(str(post), f'{user.name}:{category.name}:{post.title}', '__str__ 불일치')
+
+    def test_has_permission(self):
+        user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                   name='윤준기', password='qwer1234')
+        user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
+                                   name='윤준기2', password='qwer1234')
+
+        category = Category.objects.create(name='프로그래밍', user=user)
+        post = Post.objects.create(title='title', content='content', category=category, user=user)
+
+        self.assertTrue(post.has_permission(user))
+        self.assertFalse(post.has_permission(user2))
