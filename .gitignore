@@ -4,7 +4,8 @@ __pycache__
 
 # Environments
 venv
-
+myenv
+myvenv
 
 # Unit test / coverage reports
 htmlcov/
