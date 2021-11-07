@@ -17,3 +17,6 @@ coverage.xml
 
 # Secretkey
 secrets.json
+
+# Mac
+.DS_Store

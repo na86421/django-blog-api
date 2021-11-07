@@ -3,11 +3,8 @@ from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
-
-
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -41,12 +38,14 @@ class SignUpView(APIView):
             )
             token = Token.objects.create(user=user)
 
+            user_data = {'token': token.key}
+            user_data.update(UserSerializer(user).data)
         except KeyError:
             return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
         except ValidationError:
             return Response({'msg': '비밀번호를 수정해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'msg': '유저가 생성되었습니다.', 'token': token.key}, status=status.HTTP_201_CREATED)
+        return Response(user_data, status=status.HTTP_201_CREATED)
         
         
 class SignInView(APIView):
@@ -61,8 +60,10 @@ class SignInView(APIView):
                 return Response({'msg': '로그인에 실패하였습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
 
             token = Token.objects.get(user=user)
-            return Response({'msg': '로그인 되었습니다.', 'user': UserSerializer(user).data,
-                             'token': token.key})
+
+            user_data = {'token': token.key}
+            user_data.update(UserSerializer(user).data)
+            return Response(user_data)
 
         except KeyError:
             return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -87,17 +88,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
 
-        try:
-            if Category.objects.filter(name=data['name']).exists():
-                return Response({'msg': '이미 존재하는 카테고리명 입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        if Category.objects.filter(name=data['name']).exists():
+            return Response({'msg': '이미 존재하는 카테고리명 입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            category = Category.objects.create(name=data['name'], user=request.user)
-            return Response({'msg': '카테고리가 생성되었습니다.', 'category': CategorySerializer(category).data},
-                            status=status.HTTP_201_CREATED)
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         category = self.get_object()
@@ -111,20 +109,17 @@ class CategoryViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         category = self.get_object()
         data = request.data
+        serializer = self.get_serializer(category, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
 
         if not category.has_permission(request.user):
             return Response({'msg': '카테고리를 생성한 유저가 아닙니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            if Category.objects.filter(name=data['name']).exclude(id=category.id).exists():
-                return Response({'msg': '이미 존재하는 카테고리명 입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        if Category.objects.filter(name=data['name']).exclude(id=category.id).exists():
+            return Response({'msg': '이미 존재하는 카테고리명 입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            category.name = data['name']
-            category.save(update_fields=['name'])
-            return Response({'msg': '카테고리 이름이 변경되었습니다.', 'category': CategorySerializer(category).data})
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -133,16 +128,11 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        try:
-            post = Post.objects.create(title=data['title'], content=data['content'],
-                                       category_id=data['category_id'], user=request.user)
-
-            return Response({'msg': '포스트가 생성되었습니다.', 'post': PostSerializer(post).data},
-                            status=status.HTTP_201_CREATED)
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def destroy(self, request, pk=None):
         post = self.get_object()
@@ -156,34 +146,11 @@ class PostViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         post = self.get_object()
         data = request.data
+        serializer = self.get_serializer(post, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
 
         if not post.has_permission(request.user):
             return Response({'msg': '포스트를 생성한 유저가 아닙니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            post.title = data['title']
-            post.content = data['content']
-            post.save(update_fields=['title', 'content'])
-            return Response({'msg': '포스트가 변경되었습니다.', 'post': PostSerializer(post).data})
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=['patch'])
-    def change_category(self, request, pk=None):
-        post = self.get_object()
-        data = request.data
-
-        if not post.has_permission(request.user):
-            return Response({'msg': '포스트를 생성한 유저가 아닙니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            if not Category.objects.filter(id=data['category_id']).exists():
-                return Response({'msg': '유효한 카테고리가 아닙니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-            post.category_id = data['category_id']
-            post.save(update_fields=['category'])
-            return Response({'msg': '포스트의 카테고리가 변경되었습니다.', 'post': PostSerializer(post).data})
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.save()
+        return Response(serializer.data)
