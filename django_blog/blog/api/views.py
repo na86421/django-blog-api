@@ -49,7 +49,7 @@ class SignUpView(APIView):
         return Response({'msg': '유저가 생성되었습니다.', 'token': token.key}, status=status.HTTP_201_CREATED)
         
         
-class LoginView(APIView):
+class SignInView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request, format=None):

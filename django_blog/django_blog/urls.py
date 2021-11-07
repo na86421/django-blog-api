@@ -27,7 +27,7 @@ from blog.api import views as api_views
 
 router = DefaultRouter()
 router.register('users', api_views.UserViewSet)
-router.register('categorys', api_views.CategoryViewSet)
+router.register('categories', api_views.CategoryViewSet)
 router.register('posts', api_views.PostViewSet)
 
 schema_view = get_schema_view(
@@ -47,10 +47,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', obtain_auth_token),
-    path('api/', include(router.urls), name='api'),
-    path('signup/', api_views.SignUpView.as_view()),
-    path('login/', api_views.LoginView.as_view()),
-    path('logout/', api_views.LogoutView.as_view()),
+    path('api/v1/', include(router.urls)),
+    path('accounts/signup/', api_views.SignUpView.as_view()),
+    path('accounts/signin/', api_views.SignInView.as_view()),
+    path('accoutns/logout/', api_views.LogoutView.as_view()),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
