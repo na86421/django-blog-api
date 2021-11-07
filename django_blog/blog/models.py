@@ -12,6 +12,9 @@ class Timestampable(models.Model):
 class User(AbstractUser, Timestampable):
     name = models.CharField(max_length=200, help_text='사용자 이름')
 
+    class Meta:
+        ordering = ['-id']
+
     def __str__(self):
         return self.name
 
@@ -19,6 +22,9 @@ class User(AbstractUser, Timestampable):
 class Category(Timestampable):
     name = models.CharField(max_length=200, help_text='카테고리명')
     user = models.ForeignKey(User, on_delete=models.CASCADE, help_text='카테고리 생성한 사용자')
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.user.name}:{self.name}'
@@ -31,6 +37,9 @@ class Post(Timestampable):
     content = models.CharField(max_length=100, help_text='포스트 내용')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, help_text='속한 카테고리')
     user = models.ForeignKey(User, on_delete=models.CASCADE, help_text='포스트 생성한 사용자')
+
+    class Meta:
+        ordering = ['-id']
 
     def __str__(self):
         return f'{self.user.name}:{self.category.name}:{self.title}'
