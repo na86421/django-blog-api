@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -78,6 +78,7 @@ class LogoutView(APIView):
     #     return Response({'msg': '로그아웃되었습니다.'})
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
