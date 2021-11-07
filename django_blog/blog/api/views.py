@@ -67,15 +67,7 @@ class SignInView(APIView):
 
         except KeyError:
             return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
-        
 
-class LogoutView(APIView):
-    # TODO 로그아웃
-    pass
-    # def post(self, request, format=None):
-    #     auth_logout(request)
-
-    #     return Response({'msg': '로그아웃되었습니다.'})
 
 class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]

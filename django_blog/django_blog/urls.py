@@ -50,7 +50,6 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('accounts/signup/', api_views.SignUpView.as_view()),
     path('accounts/signin/', api_views.SignInView.as_view()),
-    path('accoutns/logout/', api_views.LogoutView.as_view()),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
