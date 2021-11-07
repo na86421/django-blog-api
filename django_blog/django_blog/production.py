@@ -14,6 +14,7 @@ from pathlib import Path
 import os, json
 from django.core.exceptions import ImproperlyConfigured
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,16 +31,15 @@ def get_secret(setting, secrets=secrets):
         error_msg = "Set the {} environment variable".format(setting)
         raise ImproperlyConfigured(error_msg)
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 SECRET_KEY = get_secret("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['127.0.0.1', '8u96f9df9h.execute-api.ap-northeast-2.amazonaws.com',]
 
 
 # Application definition
@@ -97,10 +97,10 @@ WSGI_APPLICATION = 'django_blog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret("LOCAL_DB_NAME"),
-        'USER': get_secret("LOCAL_DB_USER"),
-        'PASSWORD': get_secret("LOCAL_DB_PASSWORD"),
-        'HOST': get_secret("LOCAL_DB_HOST"),
+        'NAME': get_secret("AWS_DB_NAME"),
+        'USER': get_secret("AWS_DB_USER"),
+        'PASSWORD': get_secret("AWS_DB_PASSWORD"),
+        'HOST': get_secret("AWS_DB_HOST"),
         'PORT': '5432',
     }
 }
@@ -141,9 +141,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
+S3_BUCKET_NAME = get_secret("S3_BUCKET")
+STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"
+AWS_S3_BUCKET_NAME_STATIC = S3_BUCKET_NAME
+# serve the static files directly from the specified s3 bucket
+AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % S3_BUCKET_NAME
+STATIC_URL = "https://%s/" % AWS_S3_CUSTOM_DOMAIN
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

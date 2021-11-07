@@ -20,3 +20,6 @@ secrets.json
 
 # Mac
 .DS_Store
+
+# Static
+static/

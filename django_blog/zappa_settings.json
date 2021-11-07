@@ -1,10 +1,15 @@
 {
     "dev": {
-        "django_settings": "django_blog.settings",
+        "django_settings": "django_blog.production",
         "profile_name": "default",
         "project_name": "django-blog-api",
         "runtime": "python3.8",
         "s3_bucket": "zappa-django-blog",
-        "aws_region": "ap-northeast-2"
+        "aws_region": "ap-northeast-2",
+        "vpc_config": {
+            "SubnetIds": ["subnet-0c0e0eb9e46603a87", "subnet-052ae289991e6cbd9", 
+                          "subnet-0504c45ceb1f21736", "subnet-0f99d0a591fcb3972"],
+            "SecurityGroupIds": ["sg-0f72ebcc53c67c26a"]
+        }
     }
 }
