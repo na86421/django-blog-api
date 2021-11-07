@@ -18,6 +18,9 @@ class User(AbstractUser, Timestampable):
     def __str__(self):
         return self.name
 
+    def has_permission(self, user):
+        return True if self == user else False
+
 
 class Category(Timestampable):
     name = models.CharField(max_length=200, help_text='카테고리명')

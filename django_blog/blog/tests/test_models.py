@@ -29,6 +29,15 @@ class UserModelTest(TestCase):
         self.assertEqual(user.modified_at, mock_date, '수정시간 불일치')
         self.assertEqual(str(user), user.name, '__str__ 불일치')
 
+    def test_has_permission(self):
+        user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                   name='윤준기', password='qwer1234')
+        user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
+                                   name='윤준기2', password='qwer1234')
+
+        self.assertTrue(user.has_permission(user))
+        self.assertFalse(user.has_permission(user2))
+
 
 class CategoryTest(TestCase):
     def setUp(self):

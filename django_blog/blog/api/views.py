@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model, authenticate
-from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
@@ -7,10 +6,9 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAdminUser
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 
 from blog.models import Category, Post
 from blog.api.serializers import UserSerializer, CategorySerializer, PostSerializer
@@ -91,6 +89,31 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdminUser]
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_permissions(self):
+        if self.action in ['retrieve', 'partial_update']:
+            self.permission_classes = [IsAuthenticated]
+        return super(self.__class__, self).get_permissions()
+
+    def update(self, request, *args, **kwargs):
+        data = request.data
+        user = self.get_object()
+
+        if not user.has_permission(request.user):
+            return Response({'msg': '프로필을 수정할 권한이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_password(data['password'])
+
+            user.name = data['name']
+            user.set_password(data['password'])
+            user.save()
+            return Response(UserSerializer(user).data)
+
+        except KeyError:
+            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
+        except ValidationError:
+            return Response({'msg': '비밀번호를 수정해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):

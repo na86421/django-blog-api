@@ -93,6 +93,42 @@ class SignInViewTest(connectAPITest):
         self.assertEqual(res.status_code, 401)
 
 
+class UserViewSetTest(connectAPITest):
+    def setUp(self):
+        super().setUp()
+        self.user2 = User.objects.create_user(username='na664212', name='윤준기2', password='qwer!@#$',
+                                              is_staff=True)
+        self.data = {
+            'name': 'name',
+            'password': 'qwer!@#$'
+        }
+
+    def test_update_user(self):
+        res = self.client.patch(f'/api/v1/users/{self.user.id}/', json.dumps(self.data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(res.json()['name'], self.data['name'], '프로필 수정 실패')
+
+    def test_update_invalid_data(self):
+        self.data = {}
+
+        res = self.client.patch(f'/api/v1/users/{self.user.id}/', json.dumps(self.data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+
+    def test_update_invalid_password(self):
+        self.data['password'] = ''
+
+        res = self.client.patch(f'/api/v1/users/{self.user.id}/', json.dumps(self.data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+
+    def test_update_not_me(self):
+        res = self.client.patch(f'/api/v1/users/{self.user2.id}/', json.dumps(self.data),
+                                content_type="application/json")
+        self.assertEqual(res.status_code, 400)
+
+
 class CategoryViewSetTest(connectAPITest):
     def setUp(self):
         super().setUp()
