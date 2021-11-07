@@ -1,6 +1,6 @@
 {
     "dev": {
-        "django_settings": "django_blog.production",
+        "django_settings": "django_blog.settings.production",
         "profile_name": "default",
         "project_name": "django-blog-api",
         "runtime": "python3.8",
