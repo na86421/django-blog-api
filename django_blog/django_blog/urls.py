@@ -32,11 +32,11 @@ router.register('posts', api_views.PostViewSet)
 
 schema_view = get_schema_view(
    openapi.Info(
-      title="Snippets API",
+      title="Blog API",
       default_version='v1',
-      description="Test description",
+      description="This is blog API",
       terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
+      contact=openapi.Contact(email="na66421@gmail.com"),
       license=openapi.License(name="BSD License"),
    ),
    public=True,

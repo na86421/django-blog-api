@@ -3,6 +3,8 @@ from django.contrib.auth.hashers import is_password_usable
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAdminUser
@@ -19,6 +21,15 @@ User = get_user_model()
 
 class SignUpView(APIView):
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+            'name': openapi.Schema(type=openapi.TYPE_STRING, description='name'),
+            'password1': openapi.Schema(type=openapi.TYPE_STRING, description='password1, minLength:8'),
+            'password2': openapi.Schema(type=openapi.TYPE_STRING, description='password2 confirm, minLength:8'),
+        }))
 
     def post(self, request, format=None):
         data = request.data
@@ -50,6 +61,13 @@ class SignUpView(APIView):
         
 class SignInView(APIView):
     permission_classes = [AllowAny]
+
+    @swagger_auto_schema(request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
+        }))
 
     def post(self, request, format=None):
         data = request.data
