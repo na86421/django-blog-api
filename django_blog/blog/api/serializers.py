@@ -10,8 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         User = get_user_model()
         model = User
-        fields = ['id', 'username', 'name', 'last_login', 'created_at', 'modified_at',
-                  'is_staff', 'is_superuser']
+        fields = ['id', 'username', 'name', 'created_at', 'modified_at', 'is_staff', 'is_superuser']
 
 
 class CategorySerializer(serializers.ModelSerializer):
