@@ -28,7 +28,6 @@ class SignUpView(APIView):
             'password1': openapi.Schema(type=openapi.TYPE_STRING, description='password1, minLength:8'),
             'password2': openapi.Schema(type=openapi.TYPE_STRING, description='password2 confirm, minLength:8'),
         }))
-
     def post(self, request, format=None):
         data = request.data
 
@@ -36,7 +35,7 @@ class SignUpView(APIView):
             if data['password1'] != data['password2']:
                 return Response({'msg': '비밀번호가 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
             validate_password(data['password1'])
-            
+
             if User.objects.filter(username=data['username']).exists():
                 return Response({'msg': '이미 존재하는 username 입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -55,8 +54,8 @@ class SignUpView(APIView):
             return Response({'msg': '비밀번호를 수정해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(user_data, status=status.HTTP_201_CREATED)
-        
-        
+
+
 class SignInView(APIView):
     permission_classes = [AllowAny]
 
@@ -66,7 +65,6 @@ class SignInView(APIView):
             'username': openapi.Schema(type=openapi.TYPE_STRING, description='username'),
             'password': openapi.Schema(type=openapi.TYPE_STRING, description='password'),
         }))
-
     def post(self, request, format=None):
         data = request.data
 
@@ -162,7 +160,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         data = request.data
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         serializer.save()

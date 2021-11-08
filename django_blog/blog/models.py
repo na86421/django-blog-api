@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser
 class Timestampable(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+
     class Meta:
         abstract = True
 
@@ -34,6 +35,7 @@ class Category(Timestampable):
 
     def has_permission(self, user):
         return True if self.user == user else False
+
 
 class Post(Timestampable):
     title = models.CharField(max_length=50, help_text='포스트 제목')
