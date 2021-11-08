@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1', '8u96f9df9h.execute-api.ap-northeast-2.amazonaws.com',]
+ALLOWED_HOSTS = ['127.0.0.1', '8u96f9df9h.execute-api.ap-northeast-2.amazonaws.com']
 
 S3_BUCKET_NAME = get_secret("S3_BUCKET")
 STATICFILES_STORAGE = "django_s3_storage.storage.StaticS3Storage"

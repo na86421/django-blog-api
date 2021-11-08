@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, re_path
 from django.conf.urls import include
 
+import debug_toolbar
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
@@ -50,6 +51,7 @@ urlpatterns = [
     path('api/v1/', include(router.urls)),
     path('accounts/signup/', api_views.SignUpView.as_view()),
     path('accounts/signin/', api_views.SignInView.as_view()),
+    path('__debug__/', include(debug_toolbar.urls)),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),
     re_path(r'^swagger/$', schema_view.with_ui('swagger', cache_timeout=0),
