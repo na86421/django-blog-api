@@ -42,6 +42,7 @@ class Post(Timestampable):
     content = models.CharField(max_length=100, help_text='포스트 내용')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, help_text='속한 카테고리')
     user = models.ForeignKey(User, on_delete=models.CASCADE, help_text='포스트 생성한 사용자')
+    hits = models.PositiveIntegerField(default=0, help_text='조회수')
 
     class Meta:
         ordering = ['-id']
@@ -51,3 +52,7 @@ class Post(Timestampable):
 
     def has_permission(self, user):
         return True if self.user == user else False
+
+    def increase_hits(self):
+        self.hits += 1
+        self.save()

@@ -91,7 +91,7 @@ class UserViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action in ['retrieve', 'partial_update']:
             self.permission_classes = [IsAuthenticated]
-        return super(self.__class__, self).get_permissions()
+        return super().get_permissions()
 
     def update(self, request, *args, **kwargs):
         data = request.data
@@ -157,6 +157,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def retrieve(self, request, *args, **kwargs):
+        post = self.get_object()
+        post.increase_hits()
+        serializer = self.get_serializer(post)
+        return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
         data = request.data

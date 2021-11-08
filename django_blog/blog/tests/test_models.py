@@ -33,7 +33,7 @@ class UserModelTest(TestCase):
         user = User.objects.create(email='na66421@gmail.com', username='na66421',
                                    name='윤준기', password='qwer1234')
         user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
-                                   name='윤준기2', password='qwer1234')
+                                    name='윤준기2', password='qwer1234')
 
         self.assertTrue(user.has_permission(user))
         self.assertFalse(user.has_permission(user2))
@@ -61,7 +61,7 @@ class CategoryTest(TestCase):
         user = User.objects.create(email='na66421@gmail.com', username='na66421',
                                    name='윤준기', password='qwer1234')
         user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
-                                   name='윤준기2', password='qwer1234')
+                                    name='윤준기2', password='qwer1234')
 
         category = Category.objects.create(name='프로그래밍', user=user)
 
@@ -94,10 +94,20 @@ class PostTest(TestCase):
         user = User.objects.create(email='na66421@gmail.com', username='na66421',
                                    name='윤준기', password='qwer1234')
         user2 = User.objects.create(email='na66421_2@gmail.com', username='na66421_2',
-                                   name='윤준기2', password='qwer1234')
+                                    name='윤준기2', password='qwer1234')
 
         category = Category.objects.create(name='프로그래밍', user=user)
         post = Post.objects.create(title='title', content='content', category=category, user=user)
 
         self.assertTrue(post.has_permission(user))
         self.assertFalse(post.has_permission(user2))
+
+    def test_increase_hits(self):
+        user = User.objects.create(email='na66421@gmail.com', username='na66421',
+                                   name='윤준기', password='qwer1234')
+        category = Category.objects.create(name='프로그래밍', user=user)
+        post = Post.objects.create(title='title', content='content', category=category, user=user)
+
+        before_hits = post.hits
+        post.increase_hits()
+        self.assertEqual(before_hits + 1, post.hits)

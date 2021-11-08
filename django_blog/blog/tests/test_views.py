@@ -7,7 +7,6 @@ from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 
 from blog.models import Category, Post
-from blog.api.serializers import UserSerializer, CategorySerializer, PostSerializer
 
 
 User = get_user_model()
@@ -79,7 +78,7 @@ class SignInViewTest(connectAPITest):
     def test_signin(self):
         res = self.client.post('/accounts/signin/', json.dumps(self.data), content_type="application/json")
         self.assertEqual(res.status_code, 200)
-        
+
     def test_signin_invalid_data(self):
         self.data = {}
 
@@ -161,7 +160,7 @@ class CategoryViewSetTest(connectAPITest):
         res = self.client.delete(f'/api/v1/categories/{self.category.id}/')
         self.assertEqual(res.status_code, 200)
         self.assertFalse(Category.objects.filter(id=self.category.id).exists())
-         
+
     def test_destory_category_not_created_user(self):
         res = self.client.delete(f'/api/v1/categories/{self.category2.id}/')
         self.assertEqual(res.status_code, 400)
@@ -176,7 +175,7 @@ class CategoryViewSetTest(connectAPITest):
 
     def test_update_category_invalid_data(self):
         self.data = {}
-    
+
         res = self.client.patch(f'/api/v1/categories/{self.category.id}/', json.dumps(self.data),
                                 content_type="application/json")
         self.assertEqual(res.status_code, 400)
@@ -185,12 +184,12 @@ class CategoryViewSetTest(connectAPITest):
         res = self.client.patch(f'/api/v1/categories/{self.category2.id}/', json.dumps(self.data),
                                 content_type="application/json")
         self.assertEqual(res.status_code, 400)
-    
+
     def test_update_category_already_exists(self):
         res = self.client.patch(f'/api/v1/categories/{self.category.id}/', json.dumps(self.data),
                                 content_type="application/json")
         self.assertEqual(res.status_code, 400)
-        
+
 
 class PostViewSetTest(connectAPITest):
     def setUp(self):
@@ -201,7 +200,7 @@ class PostViewSetTest(connectAPITest):
         self.post = Post.objects.create(title='title', content='content', category=self.category,
                                         user=self.user)
         self.post2 = Post.objects.create(title='title', content='content', category=self.category,
-                                        user=self.user2)
+                                         user=self.user2)
 
         self.data = {
             'title': 'title',
@@ -209,6 +208,10 @@ class PostViewSetTest(connectAPITest):
             'category': self.category.id,
             'user': self.user.id,
         }
+
+    def test_retrieve_post(self):
+        res = self.client.get(f'/api/v1/posts/{self.post.id}/')
+        self.assertEqual(res.status_code, 200)
 
     def test_create_post(self):
         res = self.client.post('/api/v1/posts/', json.dumps(self.data),
@@ -226,7 +229,7 @@ class PostViewSetTest(connectAPITest):
         res = self.client.delete(f'/api/v1/posts/{self.post.id}/', content_type="application/json")
         self.assertEqual(res.status_code, 200)
         self.assertFalse(Post.objects.filter(id=self.post.id).exists())
-        
+
     def test_destroy_post_not_created_user(self):
         res = self.client.delete(f'/api/v1/posts/{self.post2.id}/', content_type="application/json")
         self.assertEqual(res.status_code, 400)
