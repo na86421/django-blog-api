@@ -5,7 +5,7 @@ This project is a blog CRUD REST API server.
 <img src="https://img.shields.io/badge/Django-3.0-164834"/>
 <img src="https://img.shields.io/badge/Zappa-0.54-black"/>
 
-### Prerequisites / 선행 조건
+### Prerequisites
 
 ```
 Python3.8
