@@ -22,6 +22,7 @@ $ source myenv/bin/activate
 (myenv)$ pip install -r requiremnets.txt
 
 (myenv)$ python manage.py migrate
+(myenv)$ python manage.py collectstatic
 (myenv)$ python manage.py runserver
 ```
 
