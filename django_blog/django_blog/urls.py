@@ -11,7 +11,7 @@ Class-based views
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
+    2. Add a URL to urlpatterns:  path('users/', include('users.urls'))
 """
 from django.contrib import admin
 from django.urls import path, re_path
@@ -24,7 +24,7 @@ from rest_framework import permissions
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from blog.api import views as api_views
+from users.api import views as api_views
 
 router = DefaultRouter()
 router.register('users', api_views.UserViewSet)
