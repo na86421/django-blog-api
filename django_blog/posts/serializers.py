@@ -1,31 +1,7 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from ..models import Category, Post
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        User = get_user_model()
-        model = User
-        fields = ['id', 'username', 'name', 'created_at', 'modified_at', 'is_staff', 'is_superuser']
-
-
-class CategorySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Category
-        fields = '__all__'
-
-    def validate(self, data):
-        '''
-        check name field is required
-        '''
-        err_msg = {"name": ["This field is required."]}
-        if 'name' not in data:
-            raise ValidationError(err_msg)
-        return data
+from .models import Post
 
 
 class PostSerializer(serializers.ModelSerializer):
