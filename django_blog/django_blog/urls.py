@@ -24,12 +24,10 @@ from rest_framework import permissions
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.routers import DefaultRouter
 
-from users.views import UserViewSet, SignUpView, SignInView
 from categories.views import CategoryViewSet
 from posts.views import PostViewSet
 
 router = DefaultRouter()
-router.register('users', UserViewSet)
 router.register('categories', CategoryViewSet)
 router.register('posts', PostViewSet)
 
@@ -51,8 +49,7 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('api-token-auth/', obtain_auth_token),
     path('api/v1/', include(router.urls)),
-    path('accounts/signup/', SignUpView.as_view()),
-    path('accounts/signin/', SignInView.as_view()),
+    path('api/v1/users/', include('users.urls')),
     path('__debug__/', include(debug_toolbar.urls)),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0),
             name='schema-json'),

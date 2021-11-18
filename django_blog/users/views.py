@@ -4,9 +4,8 @@ from django.core.exceptions import ValidationError
 
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
-from rest_framework import viewsets, status
+from rest_framework import status, generics, permissions
 from rest_framework.authtoken.models import Token
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -17,7 +16,7 @@ User = get_user_model()
 
 
 class SignUpView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -56,7 +55,7 @@ class SignUpView(APIView):
 
 
 class SignInView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     @swagger_auto_schema(request_body=openapi.Schema(
         type=openapi.TYPE_OBJECT,
@@ -82,35 +81,9 @@ class SignInView(APIView):
             return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAdminUser]
+class UserView(generics.RetrieveUpdateAPIView):
+    """
+    UserView can only can only retrieve and update.
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-
-    def get_permissions(self):
-        if self.action in ['retrieve', 'partial_update']:
-            self.permission_classes = [IsAuthenticated]
-        return super().get_permissions()
-
-    def update(self, request, *args, **kwargs):
-        data = request.data
-        user = self.get_object()
-
-        if not user.has_permission(request.user):
-            return Response({'msg': '프로필을 수정할 권한이 없습니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            validate_password(data['password'])
-
-            user.name = data['name']
-            user.set_password(data['password'])
-            user.save()
-            return Response(UserSerializer(user).data)
-
-        except KeyError:
-            return Response({'msg': '필수 입력항목을 입력해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
-        except ValidationError:
-            return Response({'msg': '비밀번호를 수정해주세요.'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
