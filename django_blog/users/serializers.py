@@ -1,6 +1,6 @@
-from django.contrib.auth import get_user_model, password_validation
+from django.contrib.auth import authenticate, get_user_model, password_validation
 
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,6 +18,12 @@ class UserSerializer(serializers.ModelSerializer):
         return value
 
 
-# TODO
 class SignInSerializer(serializers.Serializer):
-    pass
+    username = serializers.CharField(required=True)
+    password = serializers.CharField(required=True)
+
+    def validate(self, attrs):
+        user = authenticate(**attrs)
+        if user is None:
+            raise exceptions.AuthenticationFailed
+        return user
