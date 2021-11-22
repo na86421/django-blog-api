@@ -18,6 +18,3 @@ class User(AbstractUser, Timestampable):
 
     def __str__(self):
         return self.name
-
-    def has_permission(self, user):
-        return bool(self == user)
