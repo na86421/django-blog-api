@@ -13,6 +13,3 @@ class Category(Timestampable):
 
     def __str__(self):
         return f'{self.user.name}:{self.name}'
-
-    def has_permission(self, user):
-        return True if self.user == user else False

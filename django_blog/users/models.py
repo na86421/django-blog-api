@@ -20,4 +20,4 @@ class User(AbstractUser, Timestampable):
         return self.name
 
     def has_permission(self, user):
-        return True if self == user else False
+        return bool(self == user)
