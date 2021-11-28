@@ -10,6 +10,13 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    env:
+      SECRET_KEY: ${{ secrets.SECRET_KEY }}
+      LOCAL_DB_NAME: ${{ secrets.LOCAL_DB_NAME }}
+      LOCAL_DB_USER: ${{ secrets.LOCAL_DB_USER }}
+      LOCAL_DB_PASSWORD: ${{ secrets.LOCAL_DB_PASSWORD }}
+      LOCAL_DB_HOST: ${{ secrets.LOCAL_DB_HOST }}
+
     strategy:
       max-parallel: 4
       matrix:
