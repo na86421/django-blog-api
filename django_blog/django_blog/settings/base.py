@@ -1,30 +1,24 @@
 from pathlib import Path
 import os
-import json
 from django.core.exceptions import ImproperlyConfigured
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
-secret_file = os.path.join(BASE_DIR, 'secrets.json')
 
-with open(secret_file) as f:
-    secrets = json.loads(f.read())
-
-
-def get_secret(setting, secrets=secrets):
-    """비밀 변수를 가져오거나 명시적 예외를 반환한다."""
+def get_env_variable(var_name):
+    """환경 변수를 가져오거나 예외를 반환한다."""
     try:
-        return secrets[setting]
+        return os.environ[var_name]
     except KeyError:
-        error_msg = "Set the {} environment variable".format(setting)
+        error_msg = f"Set the {var_name} environment variable"
         raise ImproperlyConfigured(error_msg)
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-SECRET_KEY = get_secret("SECRET_KEY")
+SECRET_KEY = get_env_variable("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -91,10 +85,10 @@ WSGI_APPLICATION = 'django_blog.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': get_secret("LOCAL_DB_NAME"),
-        'USER': get_secret("LOCAL_DB_USER"),
-        'PASSWORD': get_secret("LOCAL_DB_PASSWORD"),
-        'HOST': get_secret("LOCAL_DB_HOST"),
+        'NAME': get_env_variable("LOCAL_DB_NAME"),
+        'USER': get_env_variable("LOCAL_DB_USER"),
+        'PASSWORD': get_env_variable("LOCAL_DB_PASSWORD"),
+        'HOST': get_env_variable("LOCAL_DB_HOST"),
         'PORT': '5432',
     }
 }
