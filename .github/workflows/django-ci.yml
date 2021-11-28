@@ -34,4 +34,5 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python django_blog/manage.py test
+        cd django_blog
+        python manage.py test
