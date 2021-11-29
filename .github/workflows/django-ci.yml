@@ -10,12 +10,24 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+  
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      LOCAL_DB_NAME: ${{ secrets.LOCAL_DB_NAME }}
-      LOCAL_DB_USER: ${{ secrets.LOCAL_DB_USER }}
-      LOCAL_DB_PASSWORD: ${{ secrets.LOCAL_DB_PASSWORD }}
-      LOCAL_DB_HOST: ${{ secrets.LOCAL_DB_HOST }}
+      LOCAL_DB_NAME: postgres
+      LOCAL_DB_USER: postgres
+      LOCAL_DB_PASSWORD: postgres
+      LOCAL_DB_HOST: localhost
 
     strategy:
       max-parallel: 4
