@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  django-ci-test:
 
     runs-on: ubuntu-latest
     services:
@@ -24,9 +24,9 @@ jobs:
   
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      LOCAL_DB_NAME: postgres
-      LOCAL_DB_USER: postgres
-      LOCAL_DB_PASSWORD: postgres
+      LOCAL_DB_NAME: ${{ POSTGRES_DB }}
+      LOCAL_DB_USER: ${{ POSTGRES_USER }}
+      LOCAL_DB_PASSWORD: ${{ POSTGRES_PASSWORD }}
       LOCAL_DB_HOST: localhost
 
     strategy:
@@ -47,4 +47,5 @@ jobs:
     - name: Run Tests
       run: |
         cd django_blog
-        python manage.py test
+        coverage run manage.py test
+        coverage report
