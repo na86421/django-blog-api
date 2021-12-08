@@ -36,7 +36,8 @@ class PostTest(TestCase):
     def test_create_post(self):
         user = get_user_model().objects.create_user(username='na66421', name='윤준기', password='qwer!@#$')
         category = Category.objects.create(name='python', user=user)
-        post = Post.objects.create(title='title', content='content', category=category, user=user)
+        post = Post.objects.create(title='title', content='content', category=category, user=user,
+                                   is_notice=False)
 
         self.assertEqual(post.title, 'title')
         self.assertEqual(str(post), f'{user.name}:{category.name}:{post.title}', '__str__ 불일치')

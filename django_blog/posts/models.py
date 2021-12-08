@@ -11,6 +11,7 @@ class Post(Timestampable):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, help_text='속한 카테고리')
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, help_text='포스트 생성한 사용자')
     hits = models.PositiveIntegerField(default=0, help_text='조회수')
+    is_notice = models.BooleanField(default=False, help_text='공지사항 여부')
 
     class Meta:
         ordering = ['-id']
