@@ -3,6 +3,7 @@ from django.test import TestCase
 
 from categories.models import Category
 from posts.models import Post
+from comments.models import Comment
 
 
 class UserTest(TestCase):
@@ -51,3 +52,18 @@ class PostTest(TestCase):
         before_hits = post.hits
         post.increase_hits()
         self.assertEqual(before_hits + 1, post.hits)
+
+
+class CommentTest(TestCase):
+    def setUp(self):
+        print(f'-------{self._testMethodName}-------')
+
+    def test_create_comment(self):
+        user = get_user_model().objects.create_user(username='na66421', name='윤준기', password='qwer!@#$')
+        category = Category.objects.create(name='python', user=user)
+        post = Post.objects.create(title='title', content='content', category=category, user=user,
+                                   is_notice=False)
+        comment = Comment.objects.create(content='comment', post=post, user=user)
+
+        self.assertEqual(comment.content, 'comment')
+        self.assertEqual(str(comment), f'{user.name}:{post.title}:{comment.content}', '__str__ 불일치')
