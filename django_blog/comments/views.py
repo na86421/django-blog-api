@@ -1,6 +1,9 @@
-from django.shortcuts import render
+from rest_framework import viewsets
 
-# Create your views here.
+from .models import Comment
+from .serializers import CommentSerializer
 
 
-# TODO 댓글 CRUD ?? 만들기
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
