@@ -24,10 +24,10 @@ jobs:
   
     env:
       SECRET_KEY: ${{ secrets.SECRET_KEY }}
-      LOCAL_DB_NAME: postgres
-      LOCAL_DB_USER: postgres
-      LOCAL_DB_PASSWORD: postgres
-      LOCAL_DB_HOST: localhost
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
 
     strategy:
       max-parallel: 4
