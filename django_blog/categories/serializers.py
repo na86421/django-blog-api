@@ -7,6 +7,7 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
+        read_only_fields = ['user']
 
     def validate_name(self, value):
         """
