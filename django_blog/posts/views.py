@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -9,6 +11,22 @@ from .serializers import PostSerializer
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+
+    def get_queryset(self):
+        """
+        Filter by post title, content, tags when searching with query_params.
+        """
+        queryset = super().get_queryset()
+
+        search = self.request.query_params.get('search')
+        if search:
+            # If you’re filtering on multiple tags, it’s very common to get duplicate results,
+            # because of the way relational databases work.
+            queryset = queryset.filter(
+                Q(title__icontains=search) | Q(content__icontains=search) | Q(tags__name__icontains=search)
+            ).distinct()
+
+        return queryset
 
     def retrieve(self, request, *args, **kwargs):
         post = self.get_object()
