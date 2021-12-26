@@ -24,6 +24,13 @@ class SignUpViewTest(connectAPITest):
         res = self.client.post('/api/v1/users/signup/', json.dumps(self.signup_data), content_type="application/json")
         self.assertEqual(res.status_code, 400)
 
+    def test_signup_password_encryption(self):
+        res = self.client.post('/api/v1/users/signup/', json.dumps(self.signup_data), content_type="application/json")
+        created_user = get_user_model().objects.get(id=res.json()['id'])
+
+        self.assertEqual(res.status_code, 201)
+        self.assertNotEqual(created_user.password, self.signup_data['password'])
+
 
 class SignInViewTest(connectAPITest):
     def setUp(self):
