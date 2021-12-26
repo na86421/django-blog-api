@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'zappa_django_utils',
     'django_s3_storage',
     'debug_toolbar',
+    'taggit',
 ]
 
 MIDDLEWARE = [
