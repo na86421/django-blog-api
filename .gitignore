@@ -17,6 +17,7 @@ coverage.xml
 
 # Secretkey
 secrets.json
+docker-compose.env
 
 # Mac
 .DS_Store

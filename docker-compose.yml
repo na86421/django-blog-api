@@ -1,0 +1,37 @@
+version: "3"
+
+volumes:
+  postgres_db_dev: {}
+
+services:
+  postgres:
+    container_name : postgres
+    image: postgres:12
+    volumes:
+      - postgres_db_dev:/var/lib/postgresql/data
+    env_file: 
+      - ./docker-compose.env
+    ports:
+      - "5432:5432"
+
+  django:
+    container_name : django
+    hostname: yjk
+    image: django
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    env_file: 
+      - ./docker-compose.env 
+    volumes: 
+      - ./:/django-blog-api/
+    working_dir : /django-blog-api/django_blog/
+    command: > 
+      bash -c "
+      chmod +x /wait-for-it.sh
+      && /wait-for-it.sh postgres:5432 -t 0
+      && python3 manage.py migrate
+      && python3 manage.py collectstatic --noinput
+      && python3 manage.py runserver 0.0.0.0:8000 "
+    ports: 
+      - "8000:8000"
