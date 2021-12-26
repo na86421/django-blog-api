@@ -10,6 +10,15 @@ class UserSerializer(serializers.ModelSerializer):
         model = get_user_model()
         fields = ['id', 'username', 'name', 'created_at', 'modified_at', 'is_staff', 'is_superuser', 'password']
 
+    def create(self, validated_data):
+        user = get_user_model().objects.create_user(
+            username=validated_data['username'],
+            name=validated_data['name'],
+            password=validated_data['password'],
+        )
+
+        return user
+
     def validate_password(self, value):
         """
         Check that the password is not simple.
