@@ -14,6 +14,12 @@ class PostViewSetTest(connectAPITest):
         self.post = Post.objects.create(title='title', content='content', category=self.category,
                                         user=self.user, is_notice='False')
 
+    def test_search_post(self):
+        param = f'?search={self.post.title}'
+
+        res = self.client.get('/api/v1/posts/' + param)
+        self.assertEqual(res.json()['count'], Post.objects.filter(title=self.post.title).count())
+
     def test_retrieve_post(self):
         prev_hits = self.post.hits
 
@@ -21,20 +27,28 @@ class PostViewSetTest(connectAPITest):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(prev_hits + 1, res.json()['hits'])
 
-    def test_update_category_has_not_permission(self):
-        test_user = get_user_model().objects.create_user(username='testuser', name='testuser', password='qwer!@#$')
-        category = Category.objects.create(name='python2', user=test_user)
-        post = Post.objects.create(title='title', content='content', category=category, user=test_user,
-                                   is_notice='False')
-
+    def test_update_post(self):
         update_data = {
             'title': 'Newtitle'
         }
 
-        res = self.client.patch(f'/api/v1/posts/{post.id}/', json.dumps(update_data), content_type="application/json")
-        self.assertEqual(res.status_code, 403)
+        res = self.client.patch(
+            f'/api/v1/posts/{self.post.id}/', json.dumps(update_data), content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 200)
 
-    def test_toggle_notice(self):
+    def test_update_post_changed_user(self):
+        test_user = get_user_model().objects.create_user(username='testuser', name='testuser', password='qwer!@#$')
+        update_data = {
+            'user': test_user.id
+        }
+
+        res = self.client.patch(
+            f'/api/v1/posts/{self.post.id}/', json.dumps(update_data), content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 400)
+
+    def test_post_toggle_notice(self):
         data = {
             'is_notice': True
         }

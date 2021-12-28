@@ -11,4 +11,8 @@ class PostSerializer(TaggitSerializer, serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = '__all__'
-        read_only_fields = ['user']
+
+    def update(self, instance, validated_data):
+        if instance.user != validated_data.get('user', instance.user):
+            raise serializers.ValidationError("You cannot change users.")
+        return super().update(instance, validated_data)

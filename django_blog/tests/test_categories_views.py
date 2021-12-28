@@ -21,14 +21,26 @@ class CategoryViewSetTest(connectAPITest):
         res = self.client.post('/api/v1/categories/', json.dumps(self.data), content_type="application/json")
         self.assertEqual(res.status_code, 400)
 
-    def test_update_category_has_not_permission(self):
-        test_user = get_user_model().objects.create_user(username='testuser', name='testuser', password='qwer!@#$')
-        category = Category.objects.create(name='python2', user=test_user)
-
+    def test_update_category(self):
+        category = Category.objects.create(name='python2', user=self.user)
         update_data = {
-            'name': 'Newpython2'
+            'title': 'Newtitle'
         }
 
-        res = self.client.patch(f'/api/v1/categories/{category.id}/', json.dumps(update_data),
-                                content_type="application/json")
-        self.assertEqual(res.status_code, 403)
+        res = self.client.patch(
+            f'/api/v1/categories/{category.id}/', json.dumps(update_data), content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 200)
+
+    def test_update_category_changed_user(self):
+        test_user = get_user_model().objects.create_user(username='testuser', name='testuser', password='qwer!@#$')
+        category = Category.objects.create(name='python2', user=self.user)
+
+        update_data = {
+            'user': test_user.id
+        }
+
+        res = self.client.patch(
+            f'/api/v1/categories/{category.id}/', json.dumps(update_data), content_type="application/json"
+        )
+        self.assertEqual(res.status_code, 400)

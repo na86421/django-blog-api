@@ -7,7 +7,6 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
-        read_only_fields = ['user']
 
     def validate_name(self, value):
         """
@@ -17,3 +16,8 @@ class CategorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This is a category name that already exists.")
 
         return value
+
+    def update(self, instance, validated_data):
+        if instance.user != validated_data.get('user', instance.user):
+            raise serializers.ValidationError("You cannot change users.")
+        return super().update(instance, validated_data)
