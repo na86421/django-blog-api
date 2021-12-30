@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
 from .models import Category
+from common.serializers import DisableUpdateUserMixin
 
 
-class CategorySerializer(serializers.ModelSerializer):
+class CategorySerializer(DisableUpdateUserMixin, serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = '__all__'
@@ -16,8 +17,3 @@ class CategorySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("This is a category name that already exists.")
 
         return value
-
-    def update(self, instance, validated_data):
-        if instance.user != validated_data.get('user', instance.user):
-            raise serializers.ValidationError("You cannot change users.")
-        return super().update(instance, validated_data)

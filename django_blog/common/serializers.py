@@ -1,14 +1,7 @@
 from rest_framework import serializers
 
-from .models import Comment
-from common.serializers import DisableUpdateUserMixin
 
-
-class CommentSerializer(DisableUpdateUserMixin, serializers.ModelSerializer):
-    class Meta:
-        model = Comment
-        fields = '__all__'
-
+class DisableUpdateUserMixin(serializers.BaseSerializer):
     def update(self, instance, validated_data):
         if instance.user != validated_data.get('user', instance.user):
             raise serializers.ValidationError("You cannot change users.")
