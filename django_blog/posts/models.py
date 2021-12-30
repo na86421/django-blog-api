@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from users.models import Timestampable
+from common.models import Timestampable
 from categories.models import Category
 
 from taggit.managers import TaggableManager
