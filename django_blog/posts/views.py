@@ -18,13 +18,21 @@ class PostViewSet(viewsets.ModelViewSet):
         """
         queryset = super().get_queryset()
 
-        search = self.request.query_params.get('search')
-        if search:
+        if 'search' in self.request.query_params:
+            search = self.request.query_params['search']
+
             # If you’re filtering on multiple tags, it’s very common to get duplicate results,
             # because of the way relational databases work.
             queryset = queryset.filter(
                 Q(title__icontains=search) | Q(content__icontains=search) | Q(tags__name__icontains=search)
             ).distinct()
+
+        if 'ordering' in self.request.query_params:
+            # In front, Desc: '?ordering=-field_name'
+            #           Asc: '?ordering=-field_name'
+            ordering = self.request.query_params['ordering']
+
+            queryset = queryset.order_by(ordering)
 
         return queryset
 
